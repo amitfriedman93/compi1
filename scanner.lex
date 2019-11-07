@@ -10,12 +10,9 @@ letter ([a-zA-Z])
 digit ([0-9])
 whitespace([ \t\n\r])
 comment (^[ \t]*\/\/[^\r\n]*)
-hexdigit (\x[0-9A-Fa-f]{2})
-allowedstringescape ([\\\"\n])
-"([\x20-\x21\x23-\x5B\x5D-\x7E]|\\[\\"nrt0]|\\x[0-9A-Fa-f]{2})*"
-notstring ([^\\"\n\r])
-string (^\"[^\\"\n\r]\"$)
-
+hexdigit (\\x[0-9A-Fa-f]{2})
+allowedstringescape ([\\"nrt0])
+printable ([\x20-\x21\x23-\x5B\x5D-\x7E])
 
 %%
 "void" return VOID;
@@ -46,14 +43,9 @@ string (^\"[^\\"\n\r]\"$)
 {comment} return COMMENT;
 {letter}({letter}|{digit})* return ID
 [1-9]{digit}* return NUM;
-^\"{notstring}\"$ return STRING;
-WHITESPACE([ \t\n\r])
-
-
-
-
-{whitespace} ;
-. printf("Lex doesn't know what that is!\n");
+"({printable}|\\{allowedstringescape}|\\hexdigit)*" return STRING;
+whitespace return WHITESPACE;
+. return ERROR;
 
 %%
 
