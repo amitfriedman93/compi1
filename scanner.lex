@@ -9,8 +9,10 @@ binop ([+-*\/])
 letter ([a-zA-Z])
 digit ([0-9])
 whitespace([ \t\n\r])
-
 comment (^[ \t]*\/\/[^\r\n]*)
+hexdigit (\x[0-9A-Fa-f]{2})
+allowedstringescape ([\\\"\n])
+"([\x20-\x21\x23-\x5B\x5D-\x7E]|\\[\\"nrt0]|\\x[0-9A-Fa-f]{2})*"
 notstring ([^\\"\n\r])
 string (^\"[^\\"\n\r]\"$)
 
