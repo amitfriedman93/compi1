@@ -139,6 +139,8 @@ char find_bad_escape(char* lexeme){
 }
 
 void edit_string(char* lexeme, char* new_string){
+    int num1, num2, num;
+    char old;
 
     while (lexeme){
         if (*lexeme == '"'){
@@ -173,20 +175,20 @@ void edit_string(char* lexeme, char* new_string){
                         std::cout << "Error undefined escape sequence x\n";
                         exit(0);
                     }
-                    int num1 = convert_to_num(*lexeme);
+                    num1 = convert_to_num(*lexeme);
                     if (num1 == -1){
                         std::cout << "Error undefined escape sequence x"<<*lexeme<<"\n";
                         exit(0);
                     }
-                    char old = *lexeme;
+                    old = *lexeme;
                     lexeme++;
                     if (lexeme == nullptr){
                         std::cout << "Error undefined escape sequence x"<<old<<"\n";
                         exit(0);
                     }
-                    int num2 = convert_to_num(*lexeme);
+                    num2 = convert_to_num(*lexeme);
                     if (num2 == -1){
-                        std::cout << "Error undefined escape sequence x"<<old<<*lexeme"\n";
+                        std::cout << "Error undefined escape sequence x"<<old<<*lexeme<<"\n";
                         exit(0);
                     }
                     if (is_printable((num1 * 16) + num2)){

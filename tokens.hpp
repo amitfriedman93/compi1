@@ -1,6 +1,9 @@
 #ifndef TOKENS_HPP_
 #define TOKENS_HPP_
-  enum tokentype
+
+#include "stdio.h"
+
+enum tokentype
   {
       VOID = 1,
       INT = 2,
