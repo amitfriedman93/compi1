@@ -37,7 +37,8 @@ enum tokentype
       WHITESPACE = 30,
       ERROR = 31,
       UNCLOSED = 32,
-      UNDEFINEDESCAPE = 33
+      UNDEFINEDESCAPE = 33,
+    UNDEFINEDHEX = 34
   };
   extern int yylineno;
   extern char* yytext;
