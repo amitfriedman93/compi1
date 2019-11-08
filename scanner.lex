@@ -1,11 +1,12 @@
 %{ /* Declarations section */
 #include "tokens.hpp"
+#include "stdio.h"
 %}
 
 %option yylineno
 %option noyywrap
 relop (==|!=|<|>|<=|>=)
-binop ([+-*\/])
+binop ([+\-*\/])
 letter ([a-zA-Z])
 digit ([0-9])
 whitespace([ \t\n\r])
@@ -41,12 +42,12 @@ printable ([\x20-\x21\x23-\x5B\x5D-\x7E])
 {relop} return RELOP;
 {binop} return BINOP;
 {comment} return COMMENT;
-{letter}({letter}|{digit})* return ID
+{letter}({letter}|{digit})* return ID;
 [1-9]{digit}* return NUM;
 "({printable}|\\{allowedstringescape}|{hexdigit})*" return STRING;
 "[\S\s]*[\r\n]+[\S\s]*" return UNCLOSED;
 ".*\\[^nrt0x\\].*]" return UNDEFINEDESCAPE;
-whitespace return WHITESPACE;
+{whitespace} return WHITESPACE;
 . return ERROR;
 
 %%
