@@ -1,6 +1,15 @@
 #include "tokens.hpp"
 #include "stdio.h"
+#include <iostream>
 #include <set>
+
+void edit_string(char* lexeme, char* new_string);
+
+char find_bad_escape(char* lexeme);
+
+int convert_to_num(char hexVal);
+
+bool is_printable(int hexVal);
 
 int main()
 {
@@ -91,8 +100,9 @@ int main()
             std::cout << yylineno << " NUM " << yytext << "\n";
         }
         if (token == STRING){
-            char* new_string = (char*)malloc(sizeof(char)*yyleng);
-            std::cout << yylineno << " STRING " << edit_string(yytext, new_string) << "\n";
+            char* new_string = (char*)malloc(sizeof(char)*1025);
+            edit_string(yytext, new_string);
+            std::cout << yylineno << " STRING " << new_string << "\n";
             free(new_string);
         }
         if (token == WHITESPACE){
@@ -100,12 +110,15 @@ int main()
         }
         if (token == UNCLOSED){
             std::cout << "Error unclosed string\n";
+            exit(0);
         }
         if (token == UNDEFINEDESCAPE){
             std::cout << "Error undefined escape sequence" << find_bad_escape(yytext) << "\n";
+            exit(0);
         }
         if (token == ERROR){
-            std::cout << "ERROR " << edit_string(yytext, new_string) << "\n";
+            std::cout << "ERROR " << yytext << "\n";
+            exit(0);
         }
     }
 	return 0;
@@ -117,7 +130,7 @@ char find_bad_escape(char* lexeme){
     while (lexeme != nullptr){
         if (*lexeme == '\\'){
             lexeme++;
-            if (!allowed_escaping.contains(*lexeme)){
+            if (allowed_escaping.find(*lexeme) == allowed_escaping.end()){
                 return *lexeme;
             }
         }
@@ -134,6 +147,10 @@ void edit_string(char* lexeme, char* new_string){
         }
         if (*lexeme == '\\'){
             lexeme++;
+            if (lexeme == nullptr){
+                std::cout << "Error unclosed string\n";
+                exit(0);
+            }
             switch(*lexeme){
                 case '\\':
                     *new_string = '\\';
@@ -152,10 +169,27 @@ void edit_string(char* lexeme, char* new_string){
                     break;
                 case 'x':
                     lexeme++;
+                    if (lexeme == nullptr){
+                        std::cout << "Error undefined escape sequence x\n";
+                        exit(0);
+                    }
                     int num1 = convert_to_num(*lexeme);
+                    if (num1 == -1){
+                        std::cout << "Error undefined escape sequence x"<<*lexeme<<"\n";
+                        exit(0);
+                    }
+                    char old = *lexeme;
                     lexeme++;
+                    if (lexeme == nullptr){
+                        std::cout << "Error undefined escape sequence x"<<old<<"\n";
+                        exit(0);
+                    }
                     int num2 = convert_to_num(*lexeme);
-                    if (num1 != -1 and num2!= -1 and is_printable((num1 * 16) + num2)){
+                    if (num2 == -1){
+                        std::cout << "Error undefined escape sequence x"<<old<<*lexeme"\n";
+                        exit(0);
+                    }
+                    if (is_printable((num1 * 16) + num2)){
                         *new_string = (char)((num1 * 16) + num2);
                     }
                     break;
@@ -169,6 +203,7 @@ void edit_string(char* lexeme, char* new_string){
         new_string++;
         lexeme++;
     }
+    *new_string = '\0';
 }
 
 int convert_to_num(char hexVal){
