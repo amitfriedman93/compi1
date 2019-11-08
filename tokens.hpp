@@ -32,7 +32,9 @@
       NUM = 28,
       STRING = 29,
       WHITESPACE = 30,
-      ERROR = 31
+      ERROR = 31,
+      UNCLOSED = 32,
+      UNDEFINEDESCAPE = 33
   };
   extern int yylineno;
   extern char* yytext;
