@@ -2,210 +2,21 @@
 #include "stdio.h"
 #include <iostream>
 #include <set>
-
-void edit_string(char* lexeme, char* new_string);
-
-char find_bad_escape(char* lexeme);
-
-int convert_to_num(char hexVal);
-
-bool is_printable(int hexVal);
-
-int main()
-{
-	int token;
-	while(token = yylex()) {
-		if (token == VOID){
-			std::cout << yylineno << " VOID " << yytext << "\n";
-		}
-        if (token == INT){
-            std::cout << yylineno << " INT " << yytext << "\n";
-        }
-        if (token == BYTE){
-            std::cout << yylineno << " BYTE " << yytext << "\n";
-        }
-        if (token == B){
-            std::cout << yylineno << " B " << yytext << "\n";
-        }
-        if (token == BOOL){
-            std::cout << yylineno << " BOOL " << yytext << "\n";
-        }
-        if (token == AND){
-            std::cout << yylineno << " AND " << yytext << "\n";
-        }
-        if (token == OR){
-            std::cout << yylineno << " OR " << yytext << "\n";
-        }
-        if (token == NOT){
-            std::cout << yylineno << " NOT " << yytext << "\n";
-	    }
-        if (token == TRUE){
-            std::cout << yylineno << " TRUE " << yytext << "\n";
-        }
-        if (token == FALSE){
-            std::cout << yylineno << " FALSE " << yytext << "\n";
-        }
-        if (token == RETURN){
-            std::cout << yylineno << " RETURN " << yytext << "\n";
-        }
-        if (token == IF){
-            std::cout << yylineno << " IF " << yytext << "\n";
-        }
-        if (token == ELSE){
-            std::cout << yylineno << " ELSE " << yytext << "\n";
-        }
-        if (token == WHILE){
-            std::cout << yylineno << " WHILE " << yytext << "\n";
-        }
-        if (token == BREAK){
-            std::cout << yylineno << " BREAK " << yytext << "\n";
-        }
-        if (token == CONTINUE){
-            std::cout << yylineno << " CONTINUE " << yytext << "\n";
-        }
-        if (token == SC){
-            std::cout << yylineno << " SC " << yytext << "\n";
-        }
-        if (token == COMMA){
-            std::cout << yylineno << " COMMA " << yytext << "\n";
-        }
-        if (token == LPAREN){
-            std::cout << yylineno << " LPAREN " << yytext << "\n";
-        }
-        if (token == RPAREN){
-            std::cout << yylineno << " RPAREN " << yytext << "\n";
-        }
-        if (token == LBRACE){
-            std::cout << yylineno << " LBRACE " << yytext << "\n";
-        }
-        if (token == RBRACE){
-            std::cout << yylineno << " RBRACE " << yytext << "\n";
-        }
-        if (token == ASSIGN){
-            std::cout << yylineno << " ASSIGN " << yytext << "\n";
-        }
-        if (token == RELOP){
-            std::cout << yylineno << " RELOP " << yytext << "\n";
-        }
-        if (token == BINOP){
-            std::cout << yylineno << " BINOP " << yytext << "\n";
-        }
-        if (token == COMMENT){
-            std::cout << yylineno << " COMMENT //" << "\n";
-        }
-        if (token == ID){
-            std::cout << yylineno << " ID " << yytext << "\n";
-        }
-        if (token == NUM){
-            std::cout << yylineno << " NUM " << yytext << "\n";
-        }
-        if (token == STRING){
-            char* new_string = (char*)malloc(sizeof(char)*1025);
-            edit_string(yytext, new_string);
-            std::cout << yylineno << " STRING " << new_string << "\n";
-            free(new_string);
-        }
-        if (token == WHITESPACE){
-            //Ignoring white space
-        }
-        if (token == UNCLOSED){
-            std::cout << "Error unclosed string\n";
-            exit(0);
-        }
-        if (token == UNDEFINEDESCAPE){
-            std::cout << "Error undefined escape sequence" << find_bad_escape(yytext) << "\n";
-            exit(0);
-        }
-        if (token == ERROR){
-            std::cout << "ERROR " << yytext << "\n";
-            exit(0);
-        }
-    }
-	return 0;
-}
+#include <string>
 
 
-char find_bad_escape(char* lexeme){
-    std::set <char> allowed_escaping = {'r', 'n', '\\', 't', '0', 'x', '"'};
+char find_undefined_escape(char* lexeme){
+    std::set <char> legal_escaping = {'r', 'n', '\\', 't', '0', 'x', '"'};
     while (lexeme != nullptr){
         if (*lexeme == '\\'){
             lexeme++;
-            if (allowed_escaping.find(*lexeme) == allowed_escaping.end()){
+            //current char in the lexeme appears after '\' but not defined as legal escape
+            if (lexeme != nullptr and legal_escaping.find(*lexeme) == legal_escaping.end()){
                 return *lexeme;
             }
         }
         lexeme++;
     }
-}
-
-void edit_string(char* lexeme, char* new_string){
-    int num1, num2, num;
-    char old;
-
-    while (lexeme){
-        if (*lexeme == '"'){
-            lexeme++;
-            continue;
-        }
-        if (*lexeme == '\\'){
-            lexeme++;
-            if (lexeme == nullptr){
-                std::cout << "Error unclosed string\n";
-                exit(0);
-            }
-            switch(*lexeme){
-                case '\\':
-                    *new_string = '\\';
-                    break;
-                case 'n':
-                    *new_string = '\n';
-                    break;
-                case 'r':
-                    *new_string = '\r';
-                    break;
-                case 't':
-                    *new_string = '\t';
-                    break;
-                case '"':
-                    *new_string = '"';
-                    break;
-                case 'x':
-                    lexeme++;
-                    if (lexeme == nullptr){
-                        std::cout << "Error undefined escape sequence x\n";
-                        exit(0);
-                    }
-                    num1 = convert_to_num(*lexeme);
-                    if (num1 == -1){
-                        std::cout << "Error undefined escape sequence x"<<*lexeme<<"\n";
-                        exit(0);
-                    }
-                    old = *lexeme;
-                    lexeme++;
-                    if (lexeme == nullptr){
-                        std::cout << "Error undefined escape sequence x"<<old<<"\n";
-                        exit(0);
-                    }
-                    num2 = convert_to_num(*lexeme);
-                    if (num2 == -1){
-                        std::cout << "Error undefined escape sequence x"<<old<<*lexeme<<"\n";
-                        exit(0);
-                    }
-                    if (is_printable((num1 * 16) + num2)){
-                        *new_string = (char)((num1 * 16) + num2);
-                    }
-                    break;
-                default:
-                    break;
-            }
-            new_string++;
-            lexeme++;
-        }
-        *new_string = *lexeme;
-        new_string++;
-        lexeme++;
-    }
-    *new_string = '\0';
 }
 
 int convert_to_num(char hexVal){
@@ -224,4 +35,208 @@ int convert_to_num(char hexVal){
 bool is_printable(int hexVal){
     return hexVal >= 20 && hexVal <= 126;
 }
+
+void error_handler(int token, std::string error_msg){
+    if (token == UNCLOSED){
+        std::cout << "Error unclosed string" << std::endl;
+    }
+    if (token == UNDEFINEDESCAPE){
+        std::cout << "Error undefined escape sequence" << find_undefined_escape(yytext) << std::endl;
+    }
+    if (token == ERROR){
+        std::cout << "ERROR " << yytext << std::endl;
+    }
+    if (token == UNDEFINEDHEX){
+        std::cout << "Error undefined escape sequence x" << error_msg << std::endl;
+    }
+    exit(0);
+}
+
+char hex_converter(char* lexeme){
+    int num1, num2;
+    std::string hex_data;
+
+    lexeme++;//first char after \x
+    if (lexeme == nullptr){
+        error_handler(UNDEFINEDHEX, nullptr);
+    } else {
+        num1 = convert_to_num(*lexeme);
+        hex_data += *lexeme;
+        lexeme++;
+        //if the first char after \x is not a 0-9|A-F or if it was the end of the string
+        if (num1 == -1 or lexeme == nullptr){
+            error_handler(UNDEFINEDHEX, hex_data);
+        } else {
+            num2 = convert_to_num(*lexeme);
+            hex_data += *lexeme;
+            if (num2 == -1){//if the second char after \x is not a 0-9|A-F
+                error_handler(UNDEFINEDHEX, hex_data);
+            } else {//after \x we have valid hex number
+                if (is_printable((num1 * 16) + num2)){
+                    return (char)((num1 * 16) + num2);
+                }
+            }
+        }
+    }
+}
+
+void edit_string(char* lexeme, char* new_string){
+
+    while (lexeme){
+        if (*lexeme == '"'){
+            //printing the string without "
+            lexeme++;
+            continue;
+        }
+        if (*lexeme == '\\'){
+            lexeme++;
+            if (lexeme == nullptr){
+                error_handler(UNCLOSED, nullptr);
+            } else {
+                switch(*lexeme){
+                    case '\\':
+                        *new_string = '\\';
+                        break;
+                    case 'n':
+                        *new_string = '\n';
+                        break;
+                    case 'r':
+                        *new_string = '\r';
+                        break;
+                    case 't':
+                        *new_string = '\t';
+                        break;
+                    case '"':
+                        *new_string = '"';
+                        break;
+                    case 'x':
+                        *new_string = hex_converter(lexeme);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            new_string++;
+            lexeme++;
+        } else { //char does not need a special treatment
+            *new_string = *lexeme;
+            new_string++;
+            lexeme++;
+        }
+    }
+    *new_string = '\0';
+}
+
+
+
+void basic_print(std::string token_name, char* lexeme){
+    std::cout << yylineno << " " << token_name << " " << lexeme << std::endl;
+}
+
+int main()
+{
+	int token;
+	while(token = yylex()) {
+		if (token == VOID){
+			basic_print("VOID", yytext);
+		}
+        if (token == INT){
+            basic_print("INT", yytext);
+        }
+        if (token == BYTE){
+            basic_print("BYTE", yytext);
+        }
+        if (token == B){
+            basic_print("B", yytext);
+        }
+        if (token == BOOL){
+            basic_print("BOOL", yytext);
+        }
+        if (token == AND){
+            basic_print("AND", yytext);
+        }
+        if (token == OR){
+            basic_print("OR", yytext);
+        }
+        if (token == NOT){
+            basic_print("NOT", yytext);
+	    }
+        if (token == TRUE){
+            basic_print("TRUE", yytext);
+        }
+        if (token == FALSE){
+            basic_print("FALSE", yytext);
+        }
+        if (token == RETURN){
+            basic_print("RETURN", yytext);
+        }
+        if (token == IF){
+            basic_print("IF", yytext);
+        }
+        if (token == ELSE){
+            basic_print("ELSE", yytext);
+        }
+        if (token == WHILE){
+            basic_print("WHILE", yytext);
+        }
+        if (token == BREAK){
+            basic_print("BREAK", yytext);
+        }
+        if (token == CONTINUE){
+            basic_print("CONTINUE", yytext);
+        }
+        if (token == SC){
+            basic_print("SC", yytext);
+        }
+        if (token == COMMA){
+            basic_print("COMMA", yytext);
+        }
+        if (token == LPAREN){
+            basic_print("LPAREN", yytext);
+        }
+        if (token == RPAREN){
+            basic_print("RPAREN", yytext);
+        }
+        if (token == LBRACE){
+            basic_print("LBRACE", yytext);
+        }
+        if (token == RBRACE){
+            basic_print("RBRACE", yytext);
+        }
+        if (token == ASSIGN){
+            basic_print("ASSIGN", yytext);
+        }
+        if (token == RELOP){
+            basic_print("RELOP", yytext);
+        }
+        if (token == BINOP){
+            basic_print("BINOP", yytext);
+        }
+        if (token == COMMENT){
+            basic_print("COMMENT //", static_cast<char*>(nullptr));
+        }
+        if (token == ID){
+            basic_print("ID", yytext);
+        }
+        if (token == NUM){
+            basic_print("NUM", yytext);
+        }
+        if (token == STRING){
+            char* new_string = (char*)malloc(sizeof(char)*1025);
+            edit_string(yytext, new_string);
+            basic_print("STRING", new_string);
+            free(new_string);
+        }
+        if (token == WHITESPACE){
+            //Ignoring white space
+        }
+        if (token == UNCLOSED or token == UNDEFINEDESCAPE or token == ERROR){
+            error_handler(token, nullptr);
+        }
+    }
+	return 0;
+}
+
+
+
 
