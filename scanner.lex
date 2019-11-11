@@ -9,8 +9,8 @@ relop (==|!=|<|>|<=|>=)
 binop ([+\-*\/])
 letter ([a-zA-Z])
 digit ([0-9])
-whitespace([ \t\n\r])
-comment (^[ \t]*\/\/[^\r\n]*)
+whitespace([ \t\n\r]+)
+comment (\/\/[^\r\n]*)
 hexdigit (\\x[0-9A-Fa-f]{2})
 allowedstringescape ([\\"nrt0])
 printable ([\x20-\x21\x23-\x5B\x5D-\x7E])
@@ -43,10 +43,10 @@ printable ([\x20-\x21\x23-\x5B\x5D-\x7E])
 {binop} return BINOP;
 {comment} return COMMENT;
 {letter}({letter}|{digit})* return ID;
-[1-9]{digit}* return NUM;
-"({printable}|\\{allowedstringescape}|{hexdigit})*" return STRING;
-"[\S\s]*[\r\n]+[\S\s]*" return UNCLOSED;
-".*\\[^nrt0x\\].*]" return UNDEFINEDESCAPE;
+0|[1-9]{digit}* return NUM;
+\"({printable}|\\{allowedstringescape}|{hexdigit})*\" return STRING;
+\"[\S\s]*[\r\n]+[\S\s]*\" return UNCLOSED;
+\".*\\[^nrt0x\\].*]\" return UNDEFINEDESCAPE;
 {whitespace} return WHITESPACE;
 . return ERROR;
 

@@ -1,0 +1,13 @@
+byte somebyte = 18b;
+
+"also 'simple'"
+
+"escape new lines\n"
+
+"hex \x10"
+
+"hex2 \x02"
+
+"hex2 \x3A"
+
+"hex3 \xff"
