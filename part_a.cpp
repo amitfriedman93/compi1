@@ -4,20 +4,22 @@
 #include <set>
 #include <string>
 
-
-char find_undefined_escape(char* lexeme){
-    std::set <char> legal_escaping = {'r', 'n', '\\', 't', '0', 'x', '"'};
-    while (*lexeme != '\0'){
-        if (*lexeme == '\\'){
-            lexeme++;
-            //current char in the lexeme appears after '\' but not defined as legal escape
-            if (*lexeme != '\0' and legal_escaping.find(*lexeme) == legal_escaping.end()){
-                return *lexeme;
-            }
+/**
+ * The function gets a lexeme and in the output param returns the illegal escape char.
+ * @param lexeme - the string to find the invalid escape in.
+ * @param illegalEscaping - an output param for the illegal escape char.
+ * @return - true if an illegal escape has been found, and false if we encountered an error.
+ */
+bool find_undefined_escape(std::string lexeme, char &illegalEscaping){
+    std::set<char> legalEscaping = {'r', 'n', '\\', 't', '0', 'x', '"'};
+    for(auto it = lexeme.begin(); it != lexeme.end(); ++it){
+        if(*it == '\\' && ++it != lexeme.end() && legalEscaping.find(*it) == legalEscaping.end()){
+            illegalEscaping = *it;
+            return true;
         }
-        lexeme++;
     }
-    return 'r';
+    //if we've got here, it means the final char in the lexeme is '\', therefore it is unclosed string.
+    return false;
 }
 
 int convert_to_num(char hexVal){
@@ -37,7 +39,7 @@ bool is_printable(int hexVal){
     return hexVal >= 0 && hexVal <= 127;
 }
 
-void error_handler(int token, std::string error_msg){
+void error_handler(int token, std::string errorMsg){
     if (token == UNCLOSED){
         std::cout << "Error unclosed string" << std::endl;
     }
@@ -48,91 +50,88 @@ void error_handler(int token, std::string error_msg){
         std::cout << "ERROR " << yytext << std::endl;
     }
     if (token == UNDEFINEDHEX){
-        std::cout << "Error undefined escape sequence x" << error_msg << std::endl;
+        std::cout << "Error undefined escape sequence x" << errorMsg << std::endl;
     }
     exit(0);
 }
 
-char hex_converter(char* lexeme){
+char hex_converter(std::string lexeme){
     int num1, num2;
-    std::string hex_data;
+    std::string hexData;
 
     lexeme++;//first char after \x
     if (*lexeme == '\0'){
         error_handler(UNDEFINEDHEX, "");
     } else {
         num1 = convert_to_num(*lexeme);
-        hex_data += *lexeme;
+        hexData += *lexeme;
         lexeme++;
         //if the first char after \x is not a 0-9|A-F or if it was the end of the string
         if (num1 == -1 or *lexeme == '\0'){
-            error_handler(UNDEFINEDHEX, hex_data);
+            error_handler(UNDEFINEDHEX, hexData);
         } else {
             num2 = convert_to_num(*lexeme);
-            hex_data += *lexeme;
+            hexData += *lexeme;
             if (num2 == -1){//if the second char after \x is not a 0-9|A-F
-                error_handler(UNDEFINEDHEX, hex_data);
+                error_handler(UNDEFINEDHEX, hexData);
             } else {//after \x we have valid hex number
                 if (is_printable((num1 * 16) + num2)){//maybe should change to strtol
                     return (char)((num1 * 16) + num2);
                 }
-                error_handler(UNDEFINEDHEX, hex_data);
+                error_handler(UNDEFINEDHEX, hexData);
             }
         }
     }
     error_handler(ERROR, "something bad");
 }
 
-void edit_string(char* lexeme, char* new_string){
-    while (*lexeme != '\0'){
-        if (*lexeme == '"'){
-            //printing the string without "
-            lexeme++;
-            continue;
+/**
+ * Gets a string lexeme, and edits it so that special escape sequences will be printed as needed.
+ * @param lexemeToEdit - the input lexeme.
+ * @returns the edited string
+ */
+std::string edit_string(std::string lexemeToEdit){
+
+    for (auto it = lexemeToEdit.begin(); it != lexemeToEdit.end(); ++it){
+        if (*it == '"'){
+            lexemeToEdit.erase(it);
         }
-        if (*lexeme == '\\'){
-            lexeme++;
-            if (*lexeme == '\0'){
+        else if (*it == '\\'){
+            it = lexemeToEdit.erase(it);
+            if (it != lexemeToEdit.end()){
+                switch(*it){
+                    case '\\':
+                        *it = '\\';
+                        break;
+                    case 'n':
+                        *it = '\n';
+                        break;
+                    case 'r':
+                        *it = '\r';
+                        break;
+                    case 't':
+                        *it = '\t';
+                        break;
+                    case '"':
+                        *it = '"';
+                        break;
+                    case 'x':
+                        *it = hex_converter(lexeme);
+                        lexeme += 2;
+                        break;
+                    default:
+                        error_handler(UNDEFINEDESCAPE, "");
+                }
+            } else {
                 error_handler(UNCLOSED, "");
             }
-            switch(*lexeme){
-                case '\\':
-                    *new_string = '\\';
-                    break;
-                case 'n':
-                    *new_string = '\n';
-                    break;
-                case 'r':
-                    *new_string = '\r';
-                    break;
-                case 't':
-                    *new_string = '\t';
-                    break;
-                case '"':
-                    *new_string = '"';
-                    break;
-                case 'x':
-                    *new_string = hex_converter(lexeme);
-                    lexeme += 2;
-                    break;
-                default:
-                    lexeme[1] = '\0';
-                    error_handler(UNDEFINEDESCAPE, std::string(lexeme));
-            }
-            new_string++;
-            lexeme++;
-        } else { //char does not need a special treatment
-            *new_string = *lexeme;
-            new_string++;
-            lexeme++;
         }
     }
-    *new_string = '\0';
+
+    return lexemeToEdit;
 }
 
-
-
-void basic_print(std::string token_name, char* lexeme){
+void basic_print(const std::string &token_name, const std::string &lexeme){
     std::cout << yylineno << " " << token_name << " " << lexeme << std::endl;
 }
 
@@ -216,11 +215,7 @@ int main()
             basic_print("BINOP", yytext);
         }
         if (token == COMMENT){
-            char* comment = (char*)malloc(sizeof(char)*3);
-            comment[0] = '/';
-            comment[1] = '/';
-            comment[2] = '\0';
-            basic_print("COMMENT", comment);
+            basic_print("COMMENT", "//");
         }
         if (token == ID){
             basic_print("ID", yytext);
@@ -229,11 +224,8 @@ int main()
             basic_print("NUM", yytext);
         }
         if (token == STRING){
-            char* new_string = (char*)malloc(sizeof(char)*1025);
-            edit_string(yytext, new_string);
-            basic_print("STRING", new_string);
-            //basic_print("STRING", yytext);
-            free(new_string);
+            std::string editedStr = edit_string(yytext);
+            basic_print("STRING", editedStr);
         }
         if (token == WHITESPACE){
             //Ignoring white space
