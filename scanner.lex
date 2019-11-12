@@ -45,7 +45,8 @@ printable ([\x20-\x21\x23-\x5B\x5D-\x7E])
 {letter}({letter}|{digit})* return ID;
 0|[1-9]{digit}* return NUM;
 \"({printable}|\\{allowedstringescape}|{hexdigit})*\" return STRING;
-\"[\S\s]*[\r\n]+[\S\s]*\" return UNCLOSED;
+\".*[\r\n]+.*\" return UNCLOSED;
+\"[^"]* return UNCLOSED;
 \".*\\[^nrt0x\\].*]\" return UNDEFINEDESCAPE;
 {whitespace} return WHITESPACE;
 . return ERROR;
