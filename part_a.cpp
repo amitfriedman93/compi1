@@ -42,7 +42,7 @@ void error_handler(int token, std::string error_msg){
         std::cout << "Error unclosed string" << std::endl;
     }
     if (token == UNDEFINEDESCAPE){
-        std::cout << "Error undefined escape sequence" << find_undefined_escape(yytext) << std::endl;
+        std::cout << "Error undefined escape sequence " << find_undefined_escape(yytext) << std::endl;
     }
     if (token == ERROR){
         std::cout << "ERROR " << yytext << std::endl;
