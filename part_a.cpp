@@ -91,6 +91,7 @@ std::string edit_string(std::string lexemeToEdit){
     for (auto it = lexemeToEdit.begin(); it != lexemeToEdit.end(); ++it){
         if (*it == '"'){
             lexemeToEdit.erase(it);
+            --it;
         }
         else if (*it == '\\'){
             it = lexemeToEdit.erase(it);
@@ -111,23 +112,26 @@ std::string edit_string(std::string lexemeToEdit){
                     case '"':
                         *it = '"';
                         break;
-                    case 'x':
+                    case 'x': {
                         std::string hexData;
-                        if(it + 1 == lexemeToEdit.end()){
+                        if (it + 1 == lexemeToEdit.end()) {
                             error_handler(UNDEFINEDHEX, hexData);
                         }
                         hexData += *(it + 1);
-                        if(it + 2 == lexemeToEdit.end()){
+                        if (it + 2 == lexemeToEdit.end()) {
                             error_handler(UNDEFINEDHEX, hexData);
                         }
                         hexData += *(it + 2);
                         *it = hex_converter(*(it + 1), *(it + 2));
-                        it = lexemeToEdit.erase(it + 1, it + 2);
+                        it = lexemeToEdit.erase(it + 1, it + 3);
+                        --it;
                         break;
-                    default:
+                    }
+                    default: {
                         std::string undefinedEsc;
                         undefinedEsc += *it;
                         error_handler(UNDEFINEDESCAPE, undefinedEsc);
+                    }
                 }
             } else {
                 // The last character is '\'
