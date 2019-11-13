@@ -22,6 +22,11 @@ bool find_undefined_escape(std::string lexeme, char &illegalEscaping){
     return false;
 }
 
+/**
+ * Converts a hexadecimal digit character to it's numeric value.
+ * @param hexVal - the character to convert
+ * @return - an int representing the char.
+ */
 int convert_to_num(char hexVal){
     if (hexVal >= '0' and hexVal <= '9'){
         return hexVal - '0';
@@ -39,12 +44,17 @@ bool is_printable(int hexVal){
     return hexVal >= 0 && hexVal <= 127;
 }
 
-void error_handler(int token, std::string errorMsg){
+void error_handler(int token, const std::string &errorMsg){
     if (token == UNCLOSED){
         std::cout << "Error unclosed string" << std::endl;
     }
     if (token == UNDEFINEDESCAPE){
-        std::cout << "Error undefined escape sequence" << find_undefined_escape(yytext) << std::endl;
+        char undefinedEscChar;
+        if (find_undefined_escape(yytext, undefinedEscChar)){
+            std::cout << "Error undefined escape sequence " << undefinedEscChar << std::endl;
+        } else {
+            std::cout << "Error unclosed string" << std::endl;
+        }
     }
     if (token == ERROR){
         std::cout << "ERROR " << yytext << std::endl;
@@ -55,34 +65,21 @@ void error_handler(int token, std::string errorMsg){
     exit(0);
 }
 
-char hex_converter(std::string lexeme){
+char hex_converter(char digit1, char digit2){
     int num1, num2;
     std::string hexData;
-
-    lexeme++;//first char after \x
-    if (*lexeme == '\0'){
-        error_handler(UNDEFINEDHEX, "");
-    } else {
-        num1 = convert_to_num(*lexeme);
-        hexData += *lexeme;
-        lexeme++;
-        //if the first char after \x is not a 0-9|A-F or if it was the end of the string
-        if (num1 == -1 or *lexeme == '\0'){
-            error_handler(UNDEFINEDHEX, hexData);
-        } else {
-            num2 = convert_to_num(*lexeme);
-            hexData += *lexeme;
-            if (num2 == -1){//if the second char after \x is not a 0-9|A-F
-                error_handler(UNDEFINEDHEX, hexData);
-            } else {//after \x we have valid hex number
-                if (is_printable((num1 * 16) + num2)){//maybe should change to strtol
-                    return (char)((num1 * 16) + num2);
-                }
-                error_handler(UNDEFINEDHEX, hexData);
-            }
-        }
+    hexData += digit1;
+    hexData += digit2;
+    num1 = convert_to_num(digit1);
+    num2 = convert_to_num(digit2);
+    if (num1 == -1 || num2 == -1){
+        error_handler(UNDEFINEDHEX, hexData);
     }
-    error_handler(ERROR, "something bad");
+    int decimalVal = (num1 * 16) + num2;
+    if (is_printable(decimalVal)){//TODO - maybe should change to strtol
+        return (char)decimalVal;
+    }
+    error_handler(UNDEFINEDHEX, hexData);
 }
 
 /**
@@ -91,7 +88,6 @@ char hex_converter(std::string lexeme){
  * @returns the edited string
  */
 std::string edit_string(std::string lexemeToEdit){
-
     for (auto it = lexemeToEdit.begin(); it != lexemeToEdit.end(); ++it){
         if (*it == '"'){
             lexemeToEdit.erase(it);
@@ -116,18 +112,29 @@ std::string edit_string(std::string lexemeToEdit){
                         *it = '"';
                         break;
                     case 'x':
-                        *it = hex_converter(lexeme);
-                        lexeme += 2;
+                        std::string hexData;
+                        if(it + 1 == lexemeToEdit.end()){
+                            error_handler(UNDEFINEDHEX, hexData);
+                        }
+                        hexData += *(it + 1);
+                        if(it + 2 == lexemeToEdit.end()){
+                            error_handler(UNDEFINEDHEX, hexData);
+                        }
+                        hexData += *(it + 2);
+                        *it = hex_converter(*(it + 1), *(it + 2));
+                        it = lexemeToEdit.erase(it + 1, it + 2);
                         break;
                     default:
-                        error_handler(UNDEFINEDESCAPE, "");
+                        std::string undefinedEsc;
+                        undefinedEsc += *it;
+                        error_handler(UNDEFINEDESCAPE, undefinedEsc);
                 }
             } else {
+                // The last character is '\'
                 error_handler(UNCLOSED, "");
             }
         }
     }
-
     return lexemeToEdit;
 }
 
