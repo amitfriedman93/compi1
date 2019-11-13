@@ -46,7 +46,7 @@ printable ([\x20-\x21\x23-\x5B\x5D-\x7E])
 0|[1-9]{digit}* return NUM;
 \"({printable}|\\{allowedstringescape}|{hexdigit})*\" return STRING;
 \"[\S\s]*[\r\n]+[\S\s]*\" return UNCLOSED;
-.*\\[^nrt0x\\].* return UNDEFINEDESCAPE;
+\".*\\[^nrt0x\\].*]\" return UNDEFINEDESCAPE;
 {whitespace} return WHITESPACE;
 . return ERROR;
 
