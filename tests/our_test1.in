@@ -1,0 +1,88 @@
+byte somebyte = 18b;
+
+"also 'simple'"
+
+"escape new lines\n"
+
+"hex \x10"
+
+"hex2 \x02"
+
+"hex2 \x3A"
+
+
+
+void
+int 
+byte
+b
+bool
+and
+And
+Bool
+or
+Or
+OR
+not
+Not
+NOT
+nOT
+true
+True
+TRUE
+1
+false
+FALSE
+0
+False
+return
+RETURN
+Return
+ReTuRn
+if
+IF 
+If
+iF
+else
+ELSE
+Else
+while
+WHILE
+While
+break
+BREAK
+Break
+continue
+CONTINUE
+Continue
+;
+,
+(
+)
+{
+}
+=
+==
+!=
+<
+>
+<=
+>=
++
+-
+*
+/
+// this is a comment
+blah blah //commnt
+
+x
+max
+OO7
+12AB
+42
+
+// comment@
+"hi\thow\tare\tyou"
+"Hello \x57orld!\r\nThis\tis\t\x63oo\x6C, as always."
+byte x = 15b;
+print("Hello\nyou!");
