@@ -21,7 +21,7 @@ std::pair<int, std::string> calc_op(std::string binop, std::string num1, std::st
     if (binop == "/"){
         res = n1 / n2;
     }
-    return std::pair(NUM, std::to_string(res));
+    return std::pair<int, std::string>(NUM, std::to_string(res));
 }
 
 void error_handler(int token){
@@ -107,11 +107,12 @@ void error_handler(int token){
         std::cout << "Error: STRING" << std::endl;
     }
     if (token == ERROR){
-        std::cout << "Error: " << yytext << std::endl;
+        std::cout << "Error " << yytext << std::endl;
     }
     if (token == ILLEGALEXP){
         std::cout << "Error: Bad Expression" << std::endl;
     }
+    exit(0);
 }
 
 
@@ -138,6 +139,9 @@ void calculate(std::vector<std::pair<int , std::string>> input){
     if(!wasBinop){
         error_handler(ILLEGALEXP);
     }
+    if (input.size() != 1){
+        error_handler(ILLEGALEXP);
+    }
     //if we got here than there should be only one element (the result) in the vector.
     std::cout << input.front().second<< std::endl;
 }
@@ -149,7 +153,7 @@ int main()
     std::vector<std::pair<int , std::string>> input;
 	while(token = yylex()) {
         if (token == BINOP || token == NUM) {
-            input.push_back(std::pair(token, yytext));
+            input.push_back(std::pair<int, std::string>(token, yytext));
         }
         else if (token == WHITESPACE){
             continue;
@@ -160,6 +164,7 @@ int main()
 	}
     if (input.size() == 1 && input.front().first == NUM){
         std::cout << input.front().second<< std::endl;
+        return 0;
     }
     // TODO what if input size = 0?
     calculate(input);

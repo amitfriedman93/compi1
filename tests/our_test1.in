@@ -4,9 +4,9 @@ byte somebyte = 18b;
 
 "escape new lines\n"
 
-"hex \x10"
 
-"hex2 \x02"
+
+
 
 "hex2 \x3A"
 
@@ -40,7 +40,7 @@ RETURN
 Return
 ReTuRn
 if
-IF 
+IF
 If
 iF
 else
@@ -65,7 +65,7 @@ Continue
 ==
 !=
 <
->
+> 
 <=
 >=
 +
@@ -86,3 +86,5 @@ OO7
 "Hello \x57orld!\r\nThis\tis\t\x63oo\x6C, as always."
 byte x = 15b;
 print("Hello\nyou!");
+int b = 15;
+"te\0st"

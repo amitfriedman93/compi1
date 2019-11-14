@@ -7,8 +7,6 @@
 3 STRING also 'simple'
 5 STRING escape new lines
 
-7 STRING hex
-9 STRING hex2
 11 STRING hex2 :
 15 VOID void
 16 INT int
@@ -38,7 +36,7 @@
 40 ID Return
 41 ID ReTuRn
 42 IF if
-43 ID IF 
+43 ID IF
 44 ID If
 45 ID iF
 46 ELSE else
@@ -74,7 +72,6 @@
 76 ID blah
 76 ID blah
 76 COMMENT //
-b STRING aa
 78 ID x
 79 ID max
 80 ID OO7
@@ -86,8 +83,9 @@ b STRING aa
 86 STRING Hello World!
 This	is	cool, as always.
 87 BYTE byte
-87 ID xff
+87 ID x
 87 ASSIGN =
+87 NUM 15
 87 B b
 87 SC ;
 88 ID print
@@ -96,3 +94,9 @@ This	is	cool, as always.
 you!
 88 RPAREN )
 88 SC ;
+89 INT int
+89 B b
+89 ASSIGN =
+89 NUM 15
+89 SC ;
+90 STRING te
