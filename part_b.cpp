@@ -122,7 +122,7 @@ bool apply_action_if_binop(std::vector<std::pair<int , std::string>> &input,
         if ((it+1 != input.end() && it+2 != input.end()) &&
             (*(it + 1)).first == NUM && (*(it + 2)).first == NUM){
             *it = calc_op((*it).second, (*(it + 1)).second, (*(it + 2)).second);
-            input.erase(it + 1, it + 3);
+            it = input.erase(it + 1, it + 3);
             return true;
         }
         error_handler(ILLEGALEXP);
