@@ -93,9 +93,9 @@ std::string edit_string(std::string lexemeToEdit){
             lexemeToEdit.erase(it);
             --it;
         }
-        else if (*it == '\\'){
+        if (*it == '\\'){
             it = lexemeToEdit.erase(it);
-            if (it != lexemeToEdit.end()){
+            if (it + 1 != lexemeToEdit.end()){
                 switch(*it){
                     case '\\':
                         *it = '\\';
