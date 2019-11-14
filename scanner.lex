@@ -1,10 +1,12 @@
 %{ /* Declarations section */
 #include "tokens.hpp"
 #include "stdio.h"
+
 %}
 
 %option yylineno
 %option noyywrap
+%x string
 relop (==|!=|<|>|<=|>=)
 binop ([+\-*\/])
 letter ([a-zA-Z])
@@ -14,6 +16,7 @@ comment (\/\/[^\r\n]*)
 hexdigit (\\x[0-9A-Fa-f]{2})
 allowedstringescape ([\\"nrt0])
 printable ([\x20-\x21\x23-\x5B\x5D-\x7E])
+unprintable ([^\x20-\x7E])
 
 %%
 "void" return VOID;
@@ -44,11 +47,16 @@ printable ([\x20-\x21\x23-\x5B\x5D-\x7E])
 {comment} return COMMENT;
 {letter}({letter}|{digit})* return ID;
 0|[1-9]{digit}* return NUM;
-\"({printable}|\\{allowedstringescape}|{hexdigit})*\" return STRING;
-\"[\S\s]*[\r\n]+[\S\s]*\"? return UNCLOSED;
-\".*\\[^nrt0x\\].*\" return UNDEFINEDESCAPE;
+"\"" BEGIN(string);
+<string><<EOF>> return UNCLOSED;
+<string>[\r\n] return UNCLOSED;
+<string>{unprintable} return UNCLOSED;
+<string>({printable}|\\({printable}|\\|\"))*\" {BEGIN(0);return STRING;}
+<string>({printable}|\\({printable}|\\|\"))*\\\" return UNCLOSED;
+<string>. ;
 {whitespace} return WHITESPACE;
 . return ERROR;
+
 
 %%
 
