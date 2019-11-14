@@ -112,6 +112,9 @@ std::string edit_string(std::string lexemeToEdit){
                     case '"':
                         *it = '"';
                         break;
+                    case '0':
+                        it = lexemeToEdit.erase(it, lexemeToEdit.end());
+                        return lexemeToEdit;
                     case 'x': {
                         std::string hexData;
                         if (it + 1 == lexemeToEdit.end()) {
