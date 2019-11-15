@@ -15,7 +15,7 @@ whitespace([ \t\n\r]+)
 comment (\/\/[^\r\n]*)
 hexdigit (\\x[0-9A-Fa-f]{2})
 allowedstringescape ([\\"nrt0])
-printable ([\x00-\x09\x11-\x12\x14-\x21\x23-\x5B\x5D-\xFF])
+printable ([\x00-\x09\xA-\xC\x14-\x21\x23-\x5B\x5D-\xFF])
 unprintable ([^\x20-\x7E])
 
 %%
