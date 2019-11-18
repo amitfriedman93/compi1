@@ -57,7 +57,7 @@ void error_handler(int token, const std::string &errorMsg){
         }
     }
     if (token == ERROR){
-        std::cout << "ERROR " << yytext << std::endl;
+        std::cout << "Error " << yytext << std::endl;
     }
     if (token == UNDEFINEDHEX){
         std::cout << "Error undefined escape sequence x" << errorMsg << std::endl;

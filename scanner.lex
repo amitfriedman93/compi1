@@ -15,7 +15,7 @@ whitespace([ \t\n\r]+)
 comment (\/\/[^\r\n]*)
 hexdigit (\\x[0-9A-Fa-f]{2})
 allowedstringescape ([\\"nrt0])
-printable ([\x20-\x21\x23-\x5B\x5D-\x7E])
+printable ([\x00-\x09\xB-\xC\xE-\x21\x23-\x5B\x5D-\xFF])
 unprintable ([^\x20-\x7E])
 
 %%
@@ -50,7 +50,6 @@ unprintable ([^\x20-\x7E])
 "\"" BEGIN(string);
 <string><<EOF>> return UNCLOSED;
 <string>[\r\n] return UNCLOSED;
-<string>{unprintable} return UNCLOSED;
 <string>({printable}|\\({printable}|\\|\"))*\" {BEGIN(0);return STRING;}
 <string>({printable}|\\({printable}|\\|\"))*\\\" return UNCLOSED;
 <string>. ;

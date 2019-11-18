@@ -4,9 +4,9 @@ byte somebyte = 18b;
 
 "escape new lines\n"
 
+"hex \x10"
 
-
-
+"hex2 \x02"
 
 "hex2 \x3A"
 
