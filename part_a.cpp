@@ -117,11 +117,11 @@ std::string edit_string(std::string lexemeToEdit){
                         return lexemeToEdit;
                     case 'x': {
                         std::string hexData;
-                        if (it + 1 == lexemeToEdit.end()) {
+                        if (it + 1 == lexemeToEdit.end() || *(it + 1) == '\"') {
                             error_handler(UNDEFINEDHEX, hexData);
                         }
                         hexData += *(it + 1);
-                        if (it + 2 == lexemeToEdit.end()) {
+                        if (it + 2 == lexemeToEdit.end() || *(it + 2) == '\"') {
                             error_handler(UNDEFINEDHEX, hexData);
                         }
                         hexData += *(it + 2);
