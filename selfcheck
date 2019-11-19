@@ -1,6 +1,4 @@
-
-<!-- saved from url=(0125)https://grades.cs.technion.ac.il/grades.cgi?caefgdbde0017164901f4f949f54c5+2+236360+Winter2019-2020+hw/WCFiles/selfcheck+8968 -->
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252"></head><body>#!/bin/bash
+#!/bin/bash
 
 # change these per each homework
 #	link to tests:
@@ -17,7 +15,7 @@ fi
 
 if [ -z "$1" ]
 	then
-		echo "Usage: ./"$( basename "$0" )" <your submission="" zip="" file="">"
+		echo "Usage: ./"$( basename "$0" )" <your submission zip file>"
 		exit
 fi
 
@@ -27,15 +25,15 @@ if [ ! -f "$1" ]
 		exit
 fi
 
-rm -rf "$tmpdir" &amp;&gt; /dev/null
+rm -rf "$tmpdir" &> /dev/null
 if [ -d "$tmpdir" ]
 	then
 		echo "Cannot clear tmp directory. Please delete '"$tmpdir"' manually and try again"
 		exit
 fi
-mkdir "$tmpdir" &amp;&gt; /dev/null
+mkdir "$tmpdir" &> /dev/null
 
-unzip "$1" -d "$tmpdir" &amp;&gt; /dev/null
+unzip "$1" -d "$tmpdir" &> /dev/null
 if [[ $? != 0 ]] 
 	then
 		echo "Unable to unzip submission file!"
@@ -49,13 +47,13 @@ if [ ! -f scanner.lex ]
 		exit
 fi
 
-flex scanner.lex &amp;&gt; /dev/null
+flex scanner.lex &> /dev/null
 if [[ $? != 0 ]] 
 	then
 		echo "Cannot build submission!"
 		exit
 fi
-g++ -std=c++11 lex.yy.c part_a.cpp -o part_a.out &amp;&gt; /dev/null
+g++ -std=c++11 lex.yy.c part_a.cpp -o part_a.out &> /dev/null
 if [[ $? != 0 ]] 
 	then
 		echo "Cannot build submission!"
@@ -66,7 +64,7 @@ if [ ! -f part_a.out ]
 		echo "Cannot build submission!"
 		exit
 fi
-g++ -std=c++11 lex.yy.c part_b.cpp -o part_b.out &amp;&gt; /dev/null
+g++ -std=c++11 lex.yy.c part_b.cpp -o part_b.out &> /dev/null
 if [[ $? != 0 ]] 
 	then
 		echo "Cannot build submission!"
@@ -77,14 +75,14 @@ if [ ! -f part_b.out ]
 		echo "Cannot build submission!"
 		exit
 fi
-wget  --no-check-certificate "$testsurl" &amp;&gt; /dev/null
+wget  --no-check-certificate "$testsurl" &> /dev/null
 if [ ! -f $( basename "$testsurl" ) ]
 	then
 		echo "Unable to download tests!"
 		exit
 fi
 
-unzip $( basename "$testsurl" ) &amp;&gt; /dev/null
+unzip $( basename "$testsurl" ) &> /dev/null
 if [[ $? != 0 ]] 
 	then
 		echo "Unable to unzip tests!"
@@ -94,12 +92,12 @@ fi
 #	number of tests:
 numtests=2
 #	command to execute test:
-command="./part_a.out &lt; ta\$i.in &gt;&amp; ta\$i.res"
+command="./part_a.out < ta\$i.in >& ta\$i.res"
 i="1"
 while [ $i -le $numtests ]
 	do
 		eval $command
-		diff ta$i.res ta$i.out &amp;&gt; /dev/null
+		diff ta$i.res ta$i.out &> /dev/null
 		if [[ $? != 0 ]] 
 			then
 				echo "Failed test #"$i"!"
@@ -111,12 +109,12 @@ done
 #	number of tests:
 numtests=1
 #	command to execute test:
-command="./part_b.out &lt; tb\$i.in &gt;&amp; tb\$i.res"
+command="./part_b.out < tb\$i.in >& tb\$i.res"
 i="1"
 while [ $i -le $numtests ]
 	do
 		eval $command
-		diff tb$i.res tb$i.out &amp;&gt; /dev/null
+		diff tb$i.res tb$i.out &> /dev/null
 		if [[ $? != 0 ]] 
 			then
 				echo "Failed test #"$i"!"
@@ -125,9 +123,8 @@ while [ $i -le $numtests ]
 		i=$[$i+1]
 done
 
-cd - &amp;&gt; /dev/null
+cd - &> /dev/null
 rm -rf "$tmpdir"
 
 echo "Ok to submit :)"
 exit
-</your></body></html>
